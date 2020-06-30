@@ -184,7 +184,7 @@
         var func = scope.options['on' + fn];
         var args = [elm].concat([].slice.call(arguments).slice(1));
 
-        if ( $.isFunction(func) ) {
+        if ( typeof func === 'function' ) {
           func.apply(elm, args);
         }
 
@@ -201,7 +201,7 @@
           return !!item;
         });
 
-        return $.trim(newArr.join(' '));
+        return newArr.join(' ').trim();
       }
     },
 
@@ -339,7 +339,7 @@
 
       if ( _this.state.multiple ) {
         // Make sure currentValues is an array
-        var currentValues = $.isArray(_this.state.currValue) ? _this.state.currValue : [_this.state.currValue];
+        var currentValues = Array.isArray(_this.state.currValue) ? _this.state.currValue : [_this.state.currValue];
         // I'm not happy with this, but currentValues can be an empty
         // array and we need to fallback to the default option.
         currentValues = currentValues.length === 0 ? [0] : currentValues;
@@ -354,13 +354,13 @@
           // Hide default (please choose) if more then one element were selected.
           // If no option value were given value is set to option text by default
           if ( labelMarkup.length > 1 || labelMarkup.length === 0 ) {
-            return $.trim(item.value) !== '';
+            return item.value.trim() !== '';
           }
           return item;
         });
 
         labelMarkup = $.map(labelMarkup, function(item) {
-          return $.isFunction(labelBuilder)
+          return typeof labelBuilder === 'function'
             ? labelBuilder(item)
             : _this.utils.format(labelBuilder, item);
         });
@@ -370,7 +370,7 @@
           if ( labelMarkup.length >= _this.options.multiple.maxLabelEntries + 1 ) {
             labelMarkup = labelMarkup.slice(0, _this.options.multiple.maxLabelEntries);
             labelMarkup.push(
-              $.isFunction(labelBuilder)
+              typeof labelBuilder === 'function'
                 ? labelBuilder({ text: '...' })
                 : _this.utils.format(labelBuilder, { text: '...' }));
           } else {
@@ -383,7 +383,7 @@
         var currItem = _this.lookupItems[_this.state.currValue];
 
         _this.elements.label.html(
-          $.isFunction(labelBuilder)
+          typeof labelBuilder === 'function'
             ? labelBuilder(currItem)
             : _this.utils.format(labelBuilder, currItem)
         );
@@ -471,7 +471,7 @@
         value     : $elm.val(),
         className : $elm.prop('class'),
         text      : $elm.html(),
-        slug      : $.trim(_this.utils.replaceDiacritics($elm.html())),
+        slug      : _this.utils.replaceDiacritics($elm.html()).trim(),
         alt       : $elm.attr('data-alt'),
         selected  : $elm.prop('selected'),
         disabled  : isDisabled
@@ -488,7 +488,7 @@
       var _this = this;
       var markup = '<ul>';
 
-      if ( $.isFunction(_this.options.listBuilder) && _this.options.listBuilder ) {
+      if ( typeof _this.options.listBuilder === 'function' && _this.options.listBuilder ) {
         items = _this.options.listBuilder(items);
       }
 
@@ -548,7 +548,7 @@
           itemData.disabled                 ? 'disabled' : '',
           itemData.selected                 ? 'selected' : ''
         ]),
-        $.isFunction(itemBuilder)
+        typeof itemBuilder === 'function'
           ? _this.utils.format(itemBuilder(itemData, this.$element, index), itemData)
           : _this.utils.format(itemBuilder, filteredItemData)
       );
@@ -605,7 +605,7 @@
 
             // Prevent the flicker when focusing out and back again in the browser window
             _this.elements.input.one('blur', function() {
-              _this.elements.input.blur();
+              _this.elements.input.trigger('blur');
             });
 
             if ( _this.options.openOnFocus && !_this.state.opened ) {
@@ -809,8 +809,8 @@
         // If index is an array, we can assume a multiple select and we
         // want to scroll to the uppermost selected item!
         // Math.min.apply(Math, index) returns the lowest entry in an Array.
-        index = ($.isArray(index) && index.length === 0) ? 0 : index;
-        index = $.isArray(index) ? Math.min.apply(Math, index) : index;
+        index = (Array.isArray(index) && index.length === 0) ? 0 : index;
+        index = Array.isArray(index) ? Math.min.apply(Math, index) : index;
       }
 
       var liHeight = $filteredLi.eq(index).outerHeight();
@@ -862,7 +862,7 @@
         // Give dummy input focus
         _this.elements.input.val('');
         if ( e && e.type !== 'focusin' ) {
-          _this.elements.input.focus();
+          _this.elements.input.trigger('focus');
         }
 
         // Delayed binds events on Document to make label clicks work
@@ -997,7 +997,7 @@
 
       if ( _this.state.multiple ) {
         // Make sure selectedIdx is an array
-        _this.state.selectedIdx = $.isArray(_this.state.selectedIdx) ? _this.state.selectedIdx : [_this.state.selectedIdx];
+        _this.state.selectedIdx = Array.isArray(_this.state.selectedIdx) ? _this.state.selectedIdx : [_this.state.selectedIdx];
 
         var hasSelectedIndex = $.inArray(index, _this.state.selectedIdx);
         if ( hasSelectedIndex !== -1 ) {
@@ -1070,7 +1070,7 @@
    * @type {object}
    */
   $.fn[pluginName].defaults = {
-    onChange             : function(elm) { $(elm).change(); },
+    onChange             : function(elm) { $(elm).trigger('change'); },
     maxHeight            : 300,
     keySearchTimeout     : 500,
     arrowButtonMarkup    : '<b class="button">&#x25be;</b>',
